@@ -1,7 +1,9 @@
 import Image from "next/image";
-import { StoreSettings } from "@/lib/bc-client/queries/getGlobalData";
+import { useGlobalData } from "@/context/globalData";
 
-const Header = ({ settings }: { settings?: StoreSettings }) => {
+const Header = () => {
+  const { settings } = useGlobalData();
+
   if (!settings) {
     return '';
   }
