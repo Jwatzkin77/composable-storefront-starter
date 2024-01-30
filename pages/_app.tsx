@@ -7,9 +7,9 @@ import { GlobalDataContext } from "@/context/globalData";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function App({ Component, pageProps }: AppProps) {
-  const { settings } = pageProps;
+  const { settings, navCategories } = pageProps;
   return (
-    <GlobalDataContext.Provider value={{settings}}>
+    <GlobalDataContext.Provider value={{settings, navCategories}}>
       <main
         className={
           `min-h-screen px-24 py-8 flex flex-wrap 

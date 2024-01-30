@@ -1,6 +1,11 @@
 import { useContext, createContext } from "react";
-import { StoreSettings } from "@/lib/bc-client/queries/getGlobalData";
+import { StoreSettings, NavCategory } from "@/lib/bc-client/queries/getGlobalData";
 
-export const GlobalDataContext = createContext<Partial<{ settings: StoreSettings | undefined }>>({});
+type GlobalDataContextFields = {
+  settings: StoreSettings | undefined,
+  navCategories: NavCategory[] | undefined,
+}
+
+export const GlobalDataContext = createContext<Partial<GlobalDataContextFields>>({});
 
 export const useGlobalData = () => useContext(GlobalDataContext);

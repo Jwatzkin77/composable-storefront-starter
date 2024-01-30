@@ -1,14 +1,13 @@
 import Image from "next/image";
+import Link from "next/link";
 import { useGlobalData } from "@/context/globalData";
 
 const Header = () => {
-  const { settings } = useGlobalData();
+  const { settings, navCategories } = useGlobalData();
 
-  if (!settings) {
-    return '';
-  }
+  const emptySettings = { logoImageUrl: null, logoText: null, storeName: null };
 
-  const { logoImageUrl, logoText, storeName } = settings;
+  const { logoImageUrl, logoText, storeName } = settings ?? emptySettings;
 
   return (
     <header className="w-full p-4 border-b border-neutral-300">
@@ -23,6 +22,17 @@ const Header = () => {
             )}
           </a>
         </h1>
+      </div>
+      <div>
+        {navCategories && (
+          <ul className="flex">
+            {navCategories.map(navItem => (
+              <li key={navItem.path} className="mx-2 relative">
+                <Link href={`/category${navItem.path}`}>{navItem.name}</Link>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </header>
   )

@@ -16,6 +16,12 @@ query GetSettings($logoSize: Int!) {
               }
           }
       }
+
+      categoryTree {
+        entityId
+        name
+        path
+      }
   }
 }
 `;
@@ -35,7 +41,8 @@ type GetGlobalDataResp = {
             url: string,
           }
         }
-      }
+      },
+      categoryTree: NavCategory[]
     }
   }
 }
@@ -46,8 +53,14 @@ export type StoreSettings = {
   logoImageUrl: string | null,
 }
 
+export type NavCategory = {
+  entityId: number,
+  name: string,
+  path: string,
+}
+
 export const getGlobalData: 
-  () => Promise<{settings: StoreSettings}> 
+  () => Promise<{settings: StoreSettings, navCategories: NavCategory[]}> 
 = async () => {
   const settingsResp = await bcGqlFetch<GetGlobalDataResp, GetGlobalDataVars>(
     getGlobalDataQuery,
@@ -57,12 +70,14 @@ export const getGlobalData:
   );
 
   const settings = settingsResp.data.site.settings;
+  const navCategories = settingsResp.data.site.categoryTree;
 
   return {
     settings: {
       storeName: settings.storeName ?? null,
       logoText: settings.logoV2.text ?? null,
       logoImageUrl: settings.logoV2.image?.url ?? null,
-    }
+    },
+    navCategories,
   };
 }
