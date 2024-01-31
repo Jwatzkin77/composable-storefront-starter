@@ -1,10 +1,13 @@
 import { GetServerSideProps } from 'next';
 import Image from 'next/image';
+import Link from 'next/link';
 import getGlobalServerSideProps from '@/lib/getGlobalServerSideProps';
-import { Category } from '@/lib/bc-client/types/catalog';
+import { PagedCategory, CategoryProduct } from '@/lib/bc-client/types/catalog';
 import { getCategoryWithProducts } from '@/lib/bc-client/queries/getCategoryWithProducts';
 import PageHeading from '@/components/PageHeading';
 import ProductCard from '@/components/ProductCard';
+import ArrowLongRight from '@/components/icons/ArrowLongRight';
+import ArrowLongLeft from '@/components/icons/ArrowLongLeft';
 
 export const getServerSideProps = (async (context) => {
   const globalProps = await getGlobalServerSideProps(context);
@@ -15,13 +18,20 @@ export const getServerSideProps = (async (context) => {
 
   const mainImgSize = 500;
   const thumbnailSize = 500;
+
+  const { before, after } = context.query;
   
   let category;
   try {
     category = await getCategoryWithProducts(
       path, 
-      mainImgSize, 
-      thumbnailSize
+      mainImgSize,
+      thumbnailSize,
+      {
+        limit: 12,
+        before: before ? String(before) : undefined,
+        after: after ? String(after) : undefined,
+      }
     );
   } catch (err) {
     console.log(err);
@@ -46,8 +56,10 @@ export const getServerSideProps = (async (context) => {
 }) satisfies GetServerSideProps;
 
 export default function CategoryPage(
-  {category, mainImgSize, thumbnailSize}: {category: Category, mainImgSize: number, thumbnailSize: number}
+  {category, mainImgSize, thumbnailSize}: {category: PagedCategory, mainImgSize: number, thumbnailSize: number}
 ) {
+  const { before, after } = category.page;
+
   return (
     <>
       <PageHeading>{category.name}</PageHeading>
@@ -75,6 +87,15 @@ export default function CategoryPage(
           </li>
         ))}
       </ul>
+
+      <div className="w-1/4 flex justify-around">
+          {before && (
+            <Link href={`/category${category.path}?before=${before}`}><ArrowLongLeft /></Link>
+          )}
+          {after && (
+            <Link href={`/category${category.path}?after=${after}`}><ArrowLongRight /></Link>
+          )}
+      </div>
     </>
   )
 }

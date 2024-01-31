@@ -27,3 +27,10 @@ export type BasicCategory = {
 export type Category = BasicCategory & {
   products: CategoryProduct[],
 }
+
+export type PagedCategory = Category & {
+  page: {
+    before: string | null,
+    after: string | null,
+  }
+}

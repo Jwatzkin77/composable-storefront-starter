@@ -1,5 +1,5 @@
 import { bcGqlFetch } from "../bc-client-gql";
-import { BasicCategory, Category, CategoryProduct } from "../types/catalog";
+import { BasicCategory, PagedCategory, CategoryProduct } from "../types/catalog";
 
 const categoryFragment = `
 fragment categoryFields on Category {
@@ -31,11 +31,22 @@ fragment productFields on Product {
 }
 `
 
-const getCategoryQuery = `
+const pageFragment = `
+fragment pageFields on PageInfo {
+  hasNextPage
+  hasPreviousPage
+  startCursor
+  endCursor
+}
+`
+
+const getCategoryWithBeforeQuery = `
 query GetCategory(
   $path: String!,
   $mainImgSize: Int!
-  $thumbnailSize: Int!
+  $thumbnailSize: Int!,
+  $limit: Int,
+  $before: String
 ) {
   site {
     route(path: $path) {
@@ -43,7 +54,13 @@ query GetCategory(
         __typename
         ... on Category {
           ... categoryFields
-          products {
+          products(
+            last: $limit,
+            before: $before
+          ) {
+            pageInfo {
+              ... pageFields
+            }
             edges {
               node {
                 ... productFields
@@ -59,12 +76,57 @@ query GetCategory(
 ${categoryFragment}
 
 ${productFragment}
-`;
+
+${pageFragment}
+`
+
+const getCategoryWithAfterQuery = `
+query GetCategory(
+  $path: String!,
+  $mainImgSize: Int!
+  $thumbnailSize: Int!,
+  $limit: Int,
+  $after: String
+) {
+  site {
+    route(path: $path) {
+      node {
+        __typename
+        ... on Category {
+          ... categoryFields
+          products(
+            first: $limit,
+            after: $after
+          ) {
+            pageInfo {
+              ... pageFields
+            }
+            edges {
+              node {
+                ... productFields
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+${categoryFragment}
+
+${productFragment}
+
+${pageFragment}
+`
 
 type GetCategoryWithProductsVars = {
   path: string,
   mainImgSize: number,
   thumbnailSize: number,
+  limit: number,
+  before?: string,
+  after?: string,
 }
 
 type GetCategoryWithProductsResp = {
@@ -74,6 +136,12 @@ type GetCategoryWithProductsResp = {
         node: BasicCategory & {
           "__typename": string,
           products: {
+            pageInfo: {
+              hasNextPage: boolean,
+              hasPreviousPage: boolean,
+              startCursor: string | null,
+              endCursor: string | null,
+            },
             edges: {
               node: CategoryProduct,
             }[],
@@ -87,18 +155,21 @@ type GetCategoryWithProductsResp = {
 export const getCategoryWithProducts: (
   path: string,
   mainImgSize: number,
-  thumbnailSize: number
-) => Promise<Category> = async (
+  thumbnailSize: number,
+  page: {limit: number, before?: string, after?: string}
+) => Promise<PagedCategory> = async (
   path,
   mainImgSize,
-  thumbnailSize
+  thumbnailSize,
+  page
 ) => {
   const categoryResp = await bcGqlFetch<GetCategoryWithProductsResp, GetCategoryWithProductsVars>(
-    getCategoryQuery,
+    page.before ? getCategoryWithBeforeQuery : getCategoryWithAfterQuery,
     {
       path,
       mainImgSize,
       thumbnailSize,
+      ...page
     }
   );
 
@@ -108,9 +179,16 @@ export const getCategoryWithProducts: (
   }
 
   const products = (category.products?.edges ?? []).map(edge => edge.node);
+  const pageOpts = {
+    before: category.products.pageInfo.hasPreviousPage 
+      ? category.products.pageInfo.startCursor : null,
+    after: category.products.pageInfo.hasNextPage
+      ? category.products.pageInfo.endCursor : null,
+  }
 
   return {
     ...category,
     products,
+    page: pageOpts,
   };
 }
