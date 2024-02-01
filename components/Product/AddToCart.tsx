@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Cart } from "@/lib/bc-client/types/cart";
 import { Product } from "@/lib/bc-client/types/catalog";
+import { useCustomerSession } from "@/context/customerSession";
 
 const AddToCart = ({ product }: {product: Product}) => {
   const [loading, setLoading] = useState(false);
+  const { setCart } = useCustomerSession();
 
   const onClick = async () => {
     setLoading(true);
@@ -18,6 +20,10 @@ const AddToCart = ({ product }: {product: Product}) => {
         productId: product.entityId,
       })
     }).then(res => res.json());
+
+    if (res.cart) {
+      setCart(res.cart);
+    }
 
     setLoading(false);
   }

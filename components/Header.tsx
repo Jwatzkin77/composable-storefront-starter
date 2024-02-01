@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useGlobalData } from "@/context/globalData";
+import MiniCart from "./MiniCart";
 
 const Header = () => {
   const { settings, navCategories } = useGlobalData();
@@ -22,6 +23,9 @@ const Header = () => {
             )}
           </a>
         </h1>
+        <div className="flex">
+          <MiniCart />
+        </div>
       </div>
       <div>
         {navCategories && (
