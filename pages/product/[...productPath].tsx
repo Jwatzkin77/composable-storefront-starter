@@ -4,6 +4,7 @@ import getGlobalServerSideProps from '@/lib/getGlobalServerSideProps';
 import { Product } from '@/lib/bc-client/types/catalog';
 import { getProduct } from '@/lib/bc-client/queries/getProduct';
 import PageHeading from '@/components/PageHeading';
+import AddToCart from '@/components/Product/AddToCart';
 
 export const getServerSideProps = (async (context) => {
   const globalProps = await getGlobalServerSideProps(context);
@@ -68,6 +69,7 @@ export default function ProductPage(
             <label className="font-bold">Price:</label>
             <span> {currencyFormatter.format(product.prices.price.value)}</span>
           </div>
+          <AddToCart product={product} />
         </div>
       </div>
     </>
