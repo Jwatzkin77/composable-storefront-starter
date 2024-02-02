@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useGlobalData } from "@/context/globalData";
 import MiniCart from "./MiniCart";
+import AccountLinks from "./AccountLinks";
 
 const Header = () => {
   const { settings, navCategories } = useGlobalData();
@@ -24,6 +25,7 @@ const Header = () => {
           </a>
         </h1>
         <div className="flex">
+          <AccountLinks />
           <MiniCart />
         </div>
       </div>
