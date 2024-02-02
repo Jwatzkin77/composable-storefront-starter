@@ -8,6 +8,7 @@ import PageHeading from '@/components/PageHeading';
 import ProductCard from '@/components/ProductCard';
 import ArrowLongRight from '@/components/icons/ArrowLongRight';
 import ArrowLongLeft from '@/components/icons/ArrowLongLeft';
+import getCurrentCustomer from '@/lib/getCurrentCustomer';
 
 export const getServerSideProps = (async (context) => {
   const globalProps = await getGlobalServerSideProps(context);
@@ -15,6 +16,9 @@ export const getServerSideProps = (async (context) => {
   const pathParam = context.params?.catPath ?? [];
   const pathSegments = Array.isArray(pathParam) ? pathParam : [pathParam];
   const path = "/" + pathSegments.join("/");
+
+  const { req, res } = context;
+  const customer = getCurrentCustomer(req, res);
 
   const mainImgSize = 500;
   const thumbnailSize = 500;
@@ -31,7 +35,8 @@ export const getServerSideProps = (async (context) => {
         limit: 12,
         before: before ? String(before) : undefined,
         after: after ? String(after) : undefined,
-      }
+      },
+      customer?.entityId
     );
   } catch (err) {
     console.log(err);

@@ -156,12 +156,14 @@ export const getCategoryWithProducts: (
   path: string,
   mainImgSize: number,
   thumbnailSize: number,
-  page: {limit: number, before?: string, after?: string}
+  page: {limit: number, before?: string, after?: string},
+  customerId?: number
 ) => Promise<PagedCategory> = async (
   path,
   mainImgSize,
   thumbnailSize,
-  page
+  page,
+  customerId
 ) => {
   const categoryResp = await bcGqlFetch<GetCategoryWithProductsResp, GetCategoryWithProductsVars>(
     page.before ? getCategoryWithBeforeQuery : getCategoryWithAfterQuery,
@@ -170,7 +172,8 @@ export const getCategoryWithProducts: (
       mainImgSize,
       thumbnailSize,
       ...page
-    }
+    },
+    customerId
   );
 
   const category = categoryResp.data.site.route.node;

@@ -5,6 +5,7 @@ import { Product } from '@/lib/bc-client/types/catalog';
 import { getProduct } from '@/lib/bc-client/queries/getProduct';
 import PageHeading from '@/components/PageHeading';
 import AddToCart from '@/components/Product/AddToCart';
+import getCurrentCustomer from '@/lib/getCurrentCustomer';
 
 export const getServerSideProps = (async (context) => {
   const globalProps = await getGlobalServerSideProps(context);
@@ -13,11 +14,14 @@ export const getServerSideProps = (async (context) => {
   const pathSegments = Array.isArray(pathParam) ? pathParam : [pathParam];
   const path = "/" + pathSegments.join("/");
 
+  const { req, res } = context;
+  const customer = getCurrentCustomer(req, res);
+
   const imgSize = 900;
 
   let product;
   try {
-    product = await getProduct(path, imgSize);
+    product = await getProduct(path, imgSize, customer?.entityId);
   } catch (err) {
     console.log(err);
     product = null;

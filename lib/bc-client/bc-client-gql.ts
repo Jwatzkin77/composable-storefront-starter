@@ -1,8 +1,9 @@
-export async function bcGqlFetch<RespType>(query: string): Promise<RespType>;
-export async function bcGqlFetch<RespType, VarsType>(query: string, variables: VarsType): Promise<RespType>;
+export async function bcGqlFetch<RespType>(query: string, customerId?: number): Promise<RespType>;
+export async function bcGqlFetch<RespType, VarsType>(query: string, variables: VarsType, customerId?: number): Promise<RespType>;
 export async function bcGqlFetch<RespType, VarsType>(
   query: string,
-  variables?: VarsType
+  variables?: VarsType,
+  customerId?: number
 ): Promise<RespType> {
   const { BC_STORE_HASH, BC_CHANNEL_ID, BC_CI_TOKEN } = process.env;
 
@@ -14,6 +15,7 @@ export async function bcGqlFetch<RespType, VarsType>(
         Accept: 'application/json',
         'Content-Type': 'application/json',
         Authorization: `Bearer ${BC_CI_TOKEN}`,
+        ...(customerId && { 'X-Bc-Customer-Id': String(customerId) }),
       },
       body: JSON.stringify({
         query,

@@ -58,13 +58,14 @@ export type NavCategory = {
 }
 
 export const getGlobalData: 
-  () => Promise<{settings: StoreSettings, navCategories: NavCategory[]}> 
-= async () => {
+  (customerId?: number) => Promise<{settings: StoreSettings, navCategories: NavCategory[]}> 
+= async (customerId) => {
   const settingsResp = await bcGqlFetch<GetGlobalDataResp, GetGlobalDataVars>(
     getGlobalDataQuery,
     {
       logoSize: 500,
     },
+    customerId
   );
 
   const settings = settingsResp.data.site.settings;

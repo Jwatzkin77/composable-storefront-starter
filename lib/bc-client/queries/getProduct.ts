@@ -51,17 +51,20 @@ type GetProductResp = {
 
 export const getProduct: (
   path: string,
-  imgSize: number
+  imgSize: number,
+  customerId?: number
 ) => Promise<Product> = async (
   path,
-  imgSize
+  imgSize,
+  customerId
 ) => {
   const productResp = await bcGqlFetch<GetProductResp, GetProductVars>(
     getProductQuery,
     {
       path,
       imgSize,
-    }
+    },
+    customerId
   );
 
   const product = productResp.data.site.route.node;
