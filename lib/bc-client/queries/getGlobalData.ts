@@ -18,7 +18,6 @@ query GetSettings($logoSize: Int!) {
       }
 
       categoryTree {
-        entityId
         name
         path
       }
@@ -54,7 +53,6 @@ export type StoreSettings = {
 }
 
 export type NavCategory = {
-  entityId: number,
   name: string,
   path: string,
 }
